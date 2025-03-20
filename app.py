@@ -8,13 +8,9 @@ from utils import (
     convert_text_to_hindi_tts,
 )
 from collections import Counter
-from googletrans import Translator
 
-# Initialize the translator.
-translator = Translator()
-
-st.title("News Summarization & Sentiment Analysis with Automatic Hindi Translation & TTS")
-st.write("Enter a company name to fetch news articles, analyze sentiment, and generate a final summary automatically converted to Hindi.")
+st.title("News Summarization & Sentiment Analysis with Hindi TTS")
+st.write("Enter a company name to fetch news articles, analyze sentiment, and generate a Hindi summary.")
 
 company = st.text_input("Company Name", "Tesla")
 
@@ -33,11 +29,11 @@ if st.button("Generate Report"):
             sentiment, scores = analyze_sentiment(combined_text)
             article["sentiment"] = sentiment
             article["sentiment_scores"] = scores
-            # Topics are extracted for internal analysis but not used in the final summary.
+            # Topics are still extracted but not used in the final summary.
             article["topics"] = extract_topics(combined_text)
             time.sleep(0.5)
         
-        # Display extracted articles.
+        # Display individual article details.
         st.subheader("Extracted Articles")
         for idx, article in enumerate(articles, start=1):
             st.markdown(f"**Article {idx}:**")
@@ -48,32 +44,29 @@ if st.button("Generate Report"):
             st.write("Sentiment:", article["sentiment"])
             st.markdown("---")
         
-        # Perform comparative analysis for internal metrics.
+        # Perform comparative analysis for internal metrics (sentiment distribution, coverage insights)
         analysis = comparative_analysis(articles)
         st.subheader("Comparative Analysis")
         st.write("**Sentiment Distribution:**", analysis["Sentiment Distribution"])
         st.write("**Coverage Differences:**", analysis["Coverage Differences"])
         
-        # Create a final summary report in English.
+        # Create a final Hindi summary report that aggregates all the articles.
         total_articles = len(articles)
         dist = analysis["Sentiment Distribution"]
-        final_summary_en = (
-            f"Out of a total of {total_articles} articles, {dist.get('Positive', 0)} articles are positive, "
-            f"{dist.get('Negative', 0)} are negative, and {dist.get('Neutral', 0)} are neutral. "
-            "Many articles emphasize sales growth and financial development, while some discuss regulatory challenges and legal issues. "
-            "Overall, the news coverage of the company is predominantly positive, suggesting potential market growth."
+        final_summary = (
+            f"कुल {total_articles} लेखों में से, {dist.get('Positive', 0)} लेख सकारात्मक, "
+            f"{dist.get('Negative', 0)} लेख नकारात्मक, और {dist.get('Neutral', 0)} लेख तटस्थ हैं।\n"
+            "कई लेखों में विक्रय में वृद्धि और आर्थिक विकास पर जोर दिया गया है, जबकि कुछ लेखों में नियामकीय चुनौतियाँ और कानूनी मुद्दों पर चर्चा की गई है।\n"
+            "संपूर्ण रूप से, यह रिपोर्ट दर्शाती है कि कंपनी का समाचार कवरेज मुख्य रूप से सकारात्मक है, "
+            "जो संभावित आर्थिक विकास के संकेत देता है।"
         )
         
-        # Automatically translate the final summary to Hindi.
-        translation = translator.translate(final_summary_en, dest='hi')
-        final_summary_hi = translation.text
+        st.subheader("Final Summary Report")
+        st.markdown(final_summary)
         
-        st.subheader("Final Summary Report (Hindi)")
-        st.markdown(final_summary_hi)
-        
-        # Convert the Hindi summary into speech.
+        # Convert the final summary into Hindi speech.
         with st.spinner("Generating Hindi TTS audio..."):
-            audio_file = convert_text_to_hindi_tts(final_summary_hi, output_file="summary_hi.mp3")
+            audio_file = convert_text_to_hindi_tts(final_summary, output_file="tesla_summary_hi.mp3")
         
         st.success("Audio summary generated!")
         st.audio(audio_file)
