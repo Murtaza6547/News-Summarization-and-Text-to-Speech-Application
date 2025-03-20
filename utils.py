@@ -1,7 +1,9 @@
+import nltk
+nltk.download('punkt')  # Download the required resource
+
 import requests
 from bs4 import BeautifulSoup
 import time
-import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -12,7 +14,7 @@ import platform
 
 # Download required NLTK data files (if not already available).
 nltk.download('vader_lexicon')
-nltk.download('punkt')
+
 nltk.download('averaged_perceptron_tagger')
 nltk.download('stopwords')
 
